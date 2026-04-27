@@ -4,6 +4,8 @@ An AI-powered chat extension for **SQL Server Management Studio 22** that brings
 
 SsmsAgentic adds a dockable chat panel to SSMS where you can ask Claude to explore schemas, write queries, explain execution plans, and execute SQL — all within your existing SSMS session, using your live database connection.
 
+> **Free trial release.** This extension is currently distributed as a free trial. For pricing, licensing terms, and more information, visit [ssmsagentic.io](https://ssmsagentic.io).
+
 <!-- TODO: Add screenshots here -->
 
 ## What it does
@@ -13,8 +15,8 @@ SsmsAgentic adds a dockable chat panel to SSMS where you can ask Claude to explo
 - **Schema exploration** — ask Claude about tables, views, columns, and relationships in your database
 - **Query generation** — describe what you need in plain language, get T-SQL back
 - **Query explanation** — paste a query and ask Claude to explain it or review its execution plan
-- **Safe execution** — read-only queries run directly; mutations require your explicit approval before executing
-- **Results in the SSMS grid** — query results appear in the standard SSMS results pane, not a custom UI
+- **You stay in control** — every tool call (schema reads, queries, mutations) is gated by an in-chat permission prompt; nothing runs against your database without your explicit approval
+- **Open in Query Editor** — every SQL statement Claude proposes or runs gets a one-click button to open it in a native SSMS query editor tab against your current connection
 
 ## SQL tools available to Claude
 
