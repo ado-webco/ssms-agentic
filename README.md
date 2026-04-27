@@ -38,20 +38,26 @@ All SQL operations are validated using SQL Server's ScriptDom AST to enforce rea
 
 ## Setting up the Claude CLI
 
-SsmsAgentic launches the [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/overview) as a child process, so SSMS must be able to find `claude` on the system `PATH`.
+SsmsAgentic launches the [Claude Code CLI](https://code.claude.com/docs/en/quickstart) as a child process, so SSMS must be able to find `claude` on the system `PATH`. The native Windows installer adds it for you automatically.
 
-1. **Install the CLI.** The simplest path on Windows is via npm — install [Node.js LTS](https://nodejs.org/) if you don't already have it, then from any terminal run:
+1. **Install [Git for Windows](https://git-scm.com/downloads/win)** if you don't already have it — the native Claude installer depends on it.
+2. **Install the CLI.** Open a terminal (no admin needed) and run one of the official one-liners:
+
+   PowerShell:
+   ```powershell
+   irm https://claude.ai/install.ps1 | iex
    ```
-   npm install -g @anthropic-ai/claude-code
+   Command Prompt:
    ```
-   Other install methods (native installer, WSL) are documented in the [official install guide](https://docs.anthropic.com/en/docs/claude-code/overview); the native Windows install is what SsmsAgentic expects.
-2. **Verify it's on `PATH`.** Open a fresh terminal (`cmd` or PowerShell) and run:
+   curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd
+   ```
+   Other install methods (WinGet, Homebrew, WSL) are listed in the [official quickstart](https://code.claude.com/docs/en/quickstart).
+3. **Verify it's on `PATH`.** Open a *new* terminal so it picks up the updated environment, then run:
    ```
    claude --version
    ```
-   If the command isn't recognized, locate the `claude.exe` install folder (npm global installs land in `%APPDATA%\npm` by default) and add it to your user `PATH` via **Settings → System → About → Advanced system settings → Environment Variables**.
-3. **Authenticate.** Run `claude` once in a terminal and follow the prompts to sign in to your Anthropic account. SsmsAgentic uses the same credentials.
-4. **Restart SSMS.** SSMS picks up `PATH` only at process start, so any already-running SSMS instances need to be closed and reopened after installing the CLI or editing `PATH`. If the chat pane reports that `claude` cannot be found, this is almost always the cause.
+4. **Authenticate.** Run `claude` once and follow the prompts to sign in. SsmsAgentic uses the same credentials.
+5. **Restart SSMS.** SSMS reads `PATH` only at process start, so any already-running instances need to be closed and reopened after the install. If the chat pane reports that `claude` cannot be found, this is almost always the cause.
 
 ## Installation
 
@@ -76,7 +82,7 @@ To uninstall:
 
 ## How it works
 
-SsmsAgentic hosts the [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/overview) as a child process, communicating over its stream-json protocol. SQL tools are exposed to Claude via an MCP server that routes queries back through SSMS's own connection, so the same authentication and server context you're already using applies to every query Claude runs.
+SsmsAgentic hosts the [Claude Code CLI](https://code.claude.com/docs/en/quickstart) as a child process, communicating over its stream-json protocol. SQL tools are exposed to Claude via an MCP server that routes queries back through SSMS's own connection, so the same authentication and server context you're already using applies to every query Claude runs.
 
 All tool calls require your approval — Claude proposes actions, you decide what runs.
 
