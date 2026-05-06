@@ -1,22 +1,41 @@
 # SsmsAgentic
 
-An AI-powered chat extension for **SQL Server Management Studio 22** that brings Claude directly into your database workflow.
+A Claude-powered AI assistant for **SQL Server Management Studio 22**. SsmsAgentic docks a chat pane inside SSMS and uses the locally installed [Claude Code CLI](https://code.claude.com/docs/en/quickstart) to inspect schemas, generate and explain T-SQL, run queries through SSMS's native pipeline, and carry out multi-step agentic work — all on the connection you already have open, with per-statement approval.
 
-SsmsAgentic adds a dockable chat panel to SSMS where you can ask Claude to explore schemas, write queries, explain execution plans, and execute SQL — all within your existing SSMS session, using your live database connection.
+[![SSMS 22](https://img.shields.io/badge/SSMS-22-green)](https://learn.microsoft.com/en-us/ssms/) [![Latest release](https://img.shields.io/github/v/release/ado-webco/ssms-agentic)](https://github.com/ado-webco/ssms-agentic/releases) ![Platform: Windows amd64](https://img.shields.io/badge/Platform-Windows%20amd64-lightgrey)
 
-> **Free trial release.** This extension is currently distributed as a free trial. For pricing, licensing terms, and more information, visit [ssmsagentic.io](https://ssmsagentic.io).
+[**ssmsagentic.io**](https://ssmsagentic.io) · [Install](https://ssmsagentic.io/getting-started.html) · [Docs](https://ssmsagentic.io/docs.html) · [Compare with Copilot & MCP](https://ssmsagentic.io/ai-for-sql-server.html)
 
-<!-- TODO: Add screenshots here -->
+![Plain-English question with a generated SELECT and result set inside SSMS](screenshots/top-costumers-by-revenue.png)
+
+> **15-day free trial.** Distributed under a commercial license with a 15-day trial; the clock starts the first time you open the chat pane in SSMS. For pricing and licensing terms, see [ssmsagentic.io](https://ssmsagentic.io).
 
 ## What it does
 
-- **Chat with Claude inside SSMS** — a dockable tool window, accessible from the Tools menu
-- **Uses your live connection** — Claude sees the server and database you're connected to, including Entra authentication
-- **Schema exploration** — ask Claude about tables, views, columns, and relationships in your database
-- **Query generation** — describe what you need in plain language, get T-SQL back
-- **Query explanation** — paste a query and ask Claude to explain it or review its execution plan
-- **You stay in control** — every tool call (schema reads, queries, mutations) is gated by an in-chat permission prompt; nothing runs against your database without your explicit approval
-- **Open in Query Editor** — every SQL statement Claude proposes or runs gets a one-click button to open it in a native SSMS query editor tab against your current connection
+- **Chat with Claude inside SSMS** — a dockable tool window, accessible from the **Tools** menu.
+- **Reuses your live SSMS connection** — server, database, and auth (including Entra interactive and managed identity) are taken from the active SSMS session. No connection strings, no stored credentials.
+- **Schema-aware tools** — Claude can inspect tables, views, columns, indexes, and types via MCP tools.
+- **Native SSMS execution** — queries run through SSMS's own pipeline, results render in the standard grid and messages pane.
+- **Per-statement approval** — every read and write is shown verbatim with an Allow / Deny banner before it executes; writes are highlighted; a full audit log is written to disk.
+- **Plan and DMV analysis** — reads execution plans, statistics, and waits to find the actual bottleneck and propose index, statistics, or query changes.
+- **Open in Query Editor** — every SQL statement Claude proposes or runs gets a one-click button to open it in a native SSMS query editor tab against your current connection.
+
+![Detailed query plan analysis with scan costs and missing-index recommendations](screenshots/advanced-query-plan-analysys.png)
+
+## What you can ask
+
+Concrete prompts that map to day-to-day SSMS work:
+
+- *"Find the 10 slowest queries running on this server right now and rank them by total CPU."*
+- *"Explain what the `dbo.uspGetBillOfMaterials` stored procedure does, in plain English."*
+- *"Get the top 10 customers by order revenue this quarter."*
+- *"Read the execution plan for the query in tab 2 and tell me why it's slow."*
+- *"Audit logins and roles in this database — flag SA usage, wide-open schemas, and stale accounts."*
+- *"Draft a migration that splits `Customers.FullName` into `FirstName` and `LastName` without breaking existing rows."*
+
+Every generated statement waits for your approval before it touches the database.
+
+![Allow / Deny banner showing the exact SQL Claude wants to execute before it runs](screenshots/allow-deny-banner.png)
 
 ## SQL tools available to Claude
 
@@ -61,31 +80,40 @@ SsmsAgentic launches the [Claude Code CLI](https://code.claude.com/docs/en/quick
 
 ## Installation
 
-1. Download the latest `.vsix` file from the [Releases](https://github.com/ado-webco/ssms-agentic/releases) page
-2. Close SSMS if it's running
-3. Double-click the `.vsix` file to install
+The easiest path is the signed Setup.exe at [ssmsagentic.io/getting-started.html](https://ssmsagentic.io/getting-started.html) — it bundles Git, the Claude CLI, WebView2, and the extension into one one-click install.
 
-   Or install from command line:
+To install the VSIX directly:
+
+1. Download the latest `.vsix` from the [Releases](https://github.com/ado-webco/ssms-agentic/releases) page.
+2. Close SSMS if it's running.
+3. Double-click the `.vsix` to install, or run from the command line:
    ```
    "C:\Program Files\Microsoft SQL Server Management Studio 22\Release\Common7\IDE\VSIXInstaller.exe" /q SsmsAgentic.SsmsExtension.vsix
    ```
-4. Launch SSMS — find **SsmsAgentic** under the **Tools** menu
+4. Launch SSMS and find **SsmsAgentic** under the **Tools** menu.
 
 ## Updating
 
-Download the new `.vsix` from [Releases](https://github.com/ado-webco/ssms-agentic/releases) and install it. The installer will replace the previous version automatically.
+Download the new `.vsix` from [Releases](https://github.com/ado-webco/ssms-agentic/releases) and install it. The installer replaces the previous version automatically.
 
 To uninstall:
+
 ```
 "C:\Program Files\Microsoft SQL Server Management Studio 22\Release\Common7\IDE\VSIXInstaller.exe" /q /u:SsmsAgentic.SsmsExtension.4a8e7b12-9c3d-4e5f-a1b2-c7d8e9f0a1b2
 ```
 
+## How does this compare to GitHub Copilot in SSMS or Microsoft's SQL MCP Server?
+
+They solve different problems. GitHub Copilot in SSMS is great for inline T-SQL completion while you write queries by hand. Microsoft's SQL MCP Server is plumbing for *building* agents and apps against a database. SsmsAgentic is the only one of the three that is agentic *inside* SSMS — it runs queries for you, reads plans, audits permissions, and proposes changes, with per-statement approval, using the Claude subscription you already have. Side-by-side at [ssmsagentic.io/ai-for-sql-server.html](https://ssmsagentic.io/ai-for-sql-server.html).
+
 ## How it works
 
-SsmsAgentic hosts the [Claude Code CLI](https://code.claude.com/docs/en/quickstart) as a child process, communicating over its stream-json protocol. SQL tools are exposed to Claude via an MCP server that routes queries back through SSMS's own connection, so the same authentication and server context you're already using applies to every query Claude runs.
-
-All tool calls require your approval — Claude proposes actions, you decide what runs.
+SsmsAgentic hosts the [Claude Code CLI](https://code.claude.com/docs/en/quickstart) as a child process, communicating over its stream-json protocol. SQL tools are exposed to Claude via an MCP (Model Context Protocol) server that routes queries back through SSMS's own connection, so the same authentication and server context you're already using applies to every query Claude runs. All tool calls require your approval — Claude proposes actions, you decide what runs.
 
 ## Feedback and issues
 
 Found a bug or have a feature request? Open an issue on the [issue tracker](https://github.com/ado-webco/ssms-agentic/issues).
+
+## License
+
+Proprietary — use of the SsmsAgentic extension is governed by the EULA at [ssmsagentic.io/terms.html](https://ssmsagentic.io/terms.html). The source code for the extension is not published in this repository.
